@@ -1,0 +1,4 @@
+INDEX VERSION 1.131+/home/rodrigo/Documentos/p3_correccion/.metadata/.plugins/org.eclipse.jdt.core
+1865797976.index
+4063915029.index
+646308851.index

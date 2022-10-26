@@ -1,0 +1,70 @@
+El código no está bien estructurado y modularizado, aunque has intentado seguir las indicaciones dadas en clase. El diseño todavía puede ser mejorado sustancialmente.
+
+Los requisitos funcionales están casi todos implementados (falta el módulo de experimentación) pero hay errores, tanto de implementación como de diseño.
+
+La varianza está mal calculada.[Preguntar si es válida]
+
+Las métricas (euclidea, chebycheff, … ) no están ponderadas.[¿Se refiere si peso atributos?]
+
+Los métodos min y max deberían estar en la clase Matematicas.
+[(No están en la clase atributo numerico, se obtienen de java.collections.)
+Se han añadido los metodos a la clase matematicas*OK*]
+
+La clase Modificadores es un ejemplo de código sucio. Hay métodos como addAllMembers y minusAllMembers que son idénticos!!![Eliminados]
+
+Atributo no debería ser una interface, sino una clase abstracta. La mayor parte de los métodos de las clases  A_numerico y A_categorico deben estar en Atributo.
+
+Para los pares (clave, valor) utiliza alguna implementación de Map con HashMap
+
+El pesado de casos tiene errores. La clase VotoXDistancia implementa un concepto desconocido en el ámbito del problema. Lo has entendido mal. Las 3 reglas de pesado son igualdad de votos, cercanía y voto fijo.
+
+Los pesos de los atributos no se deben almacenar en Dataset.
+[¿Clase distancia?
+¿Clasificacion?
+¿KNN?]
+
+[La clase Dataset no debe imprimir nada. Eliminar métodos como getInfo.*OK*] Los métodos de Dataset para añadir, eliminar o modificar instancias no están implementados.
+
+La clase KNN debería implementar una interface Clasificador.
+
+El preprocesado de datos debe ser un método de la clase Dataset, no de KNN.
+
+La clase Entorno no hace nada significativo y no la usas. Su trabajo en la clase KNN lo hace el método getVecinos.
+
+La clase KNN está incompleta y no hay un método clasficar!!!
+
+-------------------------------------------------------------------------------
+
+Casos de uso: 1,5
+
+Los casos de uso “Imprimir Dataset”, “Mostrar información Dataset”, “Mostrar información atributos”, “seleccionar preprocesado”, “modificar pesos de los atributos” …  se pueden ver como extensiones de “Cargar Dataset”. Estas relaciones no están especificadas en el diagrama.
+
+Debería haber un caso de uso que se llamase “Configuración del algoritmo” que se extiende con numerosos casos de uso (como “modificar valor k”).
+
+Faltan casos de uso esenciales para el sistema como “Clasificar instancia” o “Resolver experimento”.
+
+“Clasificar instancia” se debe extender con “Configuración del algoritmo”
+
+No realizas para cada caso de uso una descripción de los flujos de eventos principal y alternativos del mismo.
+
+No elaboras a partir de los casos de uso una lista con los requisitos funcionales del sistema.
+
+Clases: 2
+
+El diagrama de clases elaborado ha intentado capturar los principales conceptos del dominio de la solución, pero tiene deficiencias importantes. Haz hecho un esfuerzo grande, pero hay que pulir muchas cosas.
+
+Por ejemplo:
+
+Atributo no debería ser una interface, sino una clase abstracta. La mayor parte de los métodos de las clases  A_numerico y A_categorico deben estar en Atributo (insertar, modificar, borrar, obtener el nombre …) .
+
+Clasificacion no debe ser una clase, sino una interface.
+
+Knn tiene que tener una asociación con la interface PesadoCasos.
+
+La interface PreprocesadoDatos debe estar asociada a Dataset.
+
+TipoVotacion no debe ser una interface.
+
+Haz subordinado la clase Knn a la clase Entorno, cuando debería ser al revés.
+
+Faltan todas las clases relativas al módulo de experimentación, que no se implementó.

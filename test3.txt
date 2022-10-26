@@ -1,0 +1,60 @@
+Repeticion 1:[0m
+1kM pruebas
+Tiempo en segundos: 
+Algoritmo 1: 247
+Algoritmo 2: 223
+Algoritmo 2 10,76% + rápido
+[1;4mRepeticion 2:[0m
+1kM pruebas
+Tiempo en segundos: 
+Algoritmo 1: 248
+Algoritmo 2: 225
+Algoritmo 2 10,22% + rápido
+[1;4mRepeticion 3:[0m
+1kM pruebas
+Tiempo en segundos: 
+Algoritmo 1: 248
+Algoritmo 2: 222
+Algoritmo 2 11,71% + rápido
+[1;4mRepeticion 4:[0m
+1kM pruebas
+Tiempo en segundos: 
+Algoritmo 1: 248
+Algoritmo 2: 222
+Algoritmo 2 11,71% + rápido
+[1;4mRepeticion 5:[0m
+1kM pruebas
+Tiempo en segundos: 
+Algoritmo 1: 248
+Algoritmo 2: 222
+Algoritmo 2 11,71% + rápido
+[1;4mRepeticion 6:[0m
+1kM pruebas
+Tiempo en segundos: 
+Algoritmo 1: 248
+Algoritmo 2: 222
+Algoritmo 2 11,71% + rápido
+[1;4mRepeticion 7:[0m
+1kM pruebas
+Tiempo en segundos: 
+Algoritmo 1: 248
+Algoritmo 2: 222
+Algoritmo 2 11,71% + rápido
+[1;4mRepeticion 8:[0m
+1kM pruebas
+Tiempo en segundos: 
+Algoritmo 1: 248
+Algoritmo 2: 222
+Algoritmo 2 11,71% + rápido
+[1;4mRepeticion 9:[0m
+1kM pruebas
+Tiempo en segundos: 
+Algoritmo 1: 247
+Algoritmo 2: 221
+Algoritmo 2 11,76% + rápido
+[1;4mRepeticion 10:[0m
+1kM pruebas
+Tiempo en segundos: 
+Algoritmo 1: 247
+Algoritmo 2: 221
+Algoritmo 2 11,76% + rápido
