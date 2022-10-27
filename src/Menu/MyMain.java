@@ -48,7 +48,7 @@ public class MyMain {
 		}while(menuOption != menuEnd);//Opcion salir
 	}
 	
-	private static void dataPreprocessingMenu(Clasificacion paramClasif) {
+	private static void dataPreprocessingMenu(Dataset paramDataSet) {
 		int menuOpt=0;
 		do {
 			System.out.println("Seleccione métrica de preprocesado de datos:");
@@ -60,14 +60,15 @@ public class MyMain {
 			menuOpt=utilidades.IO.Opcion.getOpcionInt();
 
 			switch(menuOpt) {
+				// Cambiar para que se muestren las opciones desde el dataset
 				case 1:
-					paramClasif.getEntorno().getKnn().setPreprocesadoDatos(new DatosCrudos());
+					//paramClasif.getEntorno().getKnn().setPreprocesadoDatos(new DatosCrudos());
 					break;
 				case 2:
-					paramClasif.getEntorno().getKnn().setPreprocesadoDatos(new RangoZeroOne());
+					//paramClasif.getEntorno().getKnn().setPreprocesadoDatos(new RangoZeroOne());
 					break;
 				case 3:
-					paramClasif.getEntorno().getKnn().setPreprocesadoDatos(new Estandarizacion());
+					//paramClasif.getEntorno().getKnn().setPreprocesadoDatos(new Estandarizacion());
 					break;
 				case 4:
 					break;
@@ -78,14 +79,20 @@ public class MyMain {
 		}while(menuOpt!=4);
 	}
 	
-	private static void atributeWeightMenu(Dataset paramDataset) {
+	private static void atributeWeightMenu(Dataset paramDataset, 
+																				Clasificacion paramClasif) {
 		final int menuStart = 1;
 		final int menuEnd = paramDataset.getNumCol() + 1;
 		int menuOpt = 0;
+		if (((KNN)paramClasif).getEntorno().GetPesoAtrib().size() != 
+				(paramDataset.getNumCol() - 1)) {
+			((KNN)paramClasif).getEntorno().BuildPesoAtrib(paramDataset.getNumCol() - 1);
+		}
 		do {
 			System.out.print("\nMostrando pesos: "+"\n");
 			for(int i=0;i<paramDataset.getNumCol();i++) {
-				System.out.print("Peso de "+paramDataset.at(i).getNombre()+": "+paramDataset.getPesoAtrib(i)+"\t");
+				System.out.print("Peso de "+paramDataset.at(i).getNombre()+": "+
+										((KNN)paramClasif).getEntorno().GetPesoAtrib().get(i)+"\t");
 			}
 			System.out.print("\n");
 
@@ -107,7 +114,7 @@ public class MyMain {
 				while(peso<0.0) {
 					peso=utilidades.IO.Opcion.getOpcionDouble("\nIntroduzca peso: ");
 				}
-				paramDataset.modificarPesos((menuOpt-1), peso);
+				((KNN)paramClasif).getEntorno().ModifyPesoAtrib(menuOpt-1, peso);
 			}
 			if(menuOpt == (menuEnd - 1)){
 				System.out.println("Imprimiendo dataset modificado: ");
@@ -125,7 +132,7 @@ public class MyMain {
 		final int menuStart = 1;
 		final int menuEnd = 2;
 		do {
-			System.out.println("Valor actual de k: "+paramClasif.getEntorno().getKnn().getValorK());
+			System.out.println("Valor actual de k: "+((KNN)paramClasif).valork);
 			optionMenuFormat(menuStart,"Modificar el valor actual de k (numero de vecinos)");
 			exitPrint(menuEnd);
 			menuOption=utilidades.IO.Opcion.getOpcionInt();
@@ -135,7 +142,7 @@ public class MyMain {
 					while((kOption<menuStart)||(kOption>paramDataset.getNumFil())) {
 						kOption=utilidades.IO.Opcion.getOpcionInt("Introduzca el nuevo valor de k: ");
 					}
-					KNN.valork = kOption;
+					((KNN)paramClasif).valork = kOption;
 					break;
 				case 2:
 					break;
@@ -159,13 +166,13 @@ public class MyMain {
 			menuOption = utilidades.IO.Opcion.getOpcionInt();
 			switch(menuOption) {
 				case 1:
-					paramClasif.getEntorno().getKnn().setDistancia(new Euclidea());
+					((KNN)paramClasif).getEntorno().SetDistanceMetric(new Euclidea());
 					break;
 				case 2:
-					paramClasif.getEntorno().getKnn().setDistancia(new Manhattan());
+					((KNN)paramClasif).getEntorno().SetDistanceMetric(new Manhattan());
 					break;
 				case 3:
-					paramClasif.getEntorno().getKnn().setDistancia(new Chebychef());
+					((KNN)paramClasif).getEntorno().SetDistanceMetric(new Chebychef());
 					break;
 				case 4:
 					break;
@@ -191,17 +198,17 @@ public class MyMain {
 			menuOption = utilidades.IO.Opcion.getOpcionInt();
 			switch(menuOption) {
 				case menuStart:
-					paramClasif.getEntorno().setVotacion(new IgualdadVotos());
+					((KNN)paramClasif).setPesadoCasos(new IgualdadVotos());
 					break;
 				case (menuStart + 1):
-					paramClasif.getEntorno().setVotacion(new Cercania());
+					((KNN)paramClasif).setPesadoCasos(new Cercania());
 					break;
 				case (menuStart + 2):
-					paramClasif.getEntorno().setVotacion(new VotoFijo(paramClasif.getEntorno().getKnn().getValorK()));
+					((KNN)paramClasif).setPesadoCasos(new VotoFijo(((KNN)paramClasif).valork));
 					break;
-				case (menuStart + 3):
-					paramClasif.getEntorno().setVotacion(new VotoXDistancia(paramClasif.getEntorno().getKnn().getValorK()));
-					break;
+				// case (menuStart + 3):
+				// 	paramClasif.getEntorno().setVotacion(new VotoXDistancia(paramClasif.getEntorno().getKnn().getValorK()));
+				// 	break;
 				case menuEnd:
 					break;
 				default:
@@ -223,9 +230,9 @@ public class MyMain {
 			menuOption = utilidades.IO.Opcion.getOpcionInt();
 			switch(menuOption) {
 				case menuStart:
-					paramClasif.setVotacion(new MayoriaSimple());
+					((KNN)paramClasif).setVotacion(new MayoriaSimple());
 					break;
-				case (menuStart + 1):
+				case (menuStart + 1): {
 					double umbralOption = -1.0;
 					while((umbralOption<0.0)||(umbralOption>1.0)) {
 					String enterkey = utilidades.IO.Opcion.getOpcionString("Introduzca umbral de aceptación (0-1,dos decimales): ");
@@ -234,8 +241,9 @@ public class MyMain {
 					} else
 						umbralOption = Double.valueOf(enterkey);
 					}
-					paramClasif.setVotacion(new Umbral(umbralOption));
+					((KNN)paramClasif).setVotacion(new Umbral(umbralOption));
 					break;
+				}
 				case menuEnd:
 					break;
 				default:
@@ -252,7 +260,7 @@ public class MyMain {
 		final int menuEnd=3;
 		int auxVariable=0;
 		//Meter instancia por fichero
-		if(!paramClasif.getEntorno().getKnn().getPreprocesadoDatos().getNombre().equals(DatosCrudos.getNombreStatic())) {
+		if(!(paramDataset.getDataPreprocessingMetric().equals(DatosCrudos.getNombreStatic()))) {
 			do {
 				System.out.println("¿Desea procesar los datos antes o después de introducir la instancia?");
 				optionMenuFormat(menuStart,"Antes");
@@ -283,8 +291,8 @@ public class MyMain {
 					System.out.println("Introduzca la instancia a evaluar");
 					inst = new Instancia(Instancia.leerInstancia(paramDataset.getNumCol()));
 				}
-				paramClasif.setMomento(auxVariable);
-				System.out.println("Instancia clasificada como: "+paramClasif.getGanadorVotacion(paramDataset.copia(), inst));
+				((KNN)paramClasif).setMomento(auxVariable);
+				System.out.println("Instancia clasificada como: "+paramClasif.clasificar(paramDataset.copia(), inst));
 				menuOption=menuEnd;
 			}
 		}while(menuOption!=menuEnd);
@@ -296,7 +304,8 @@ public class MyMain {
 	public static void main(String[] args) {
 		final int OPCIONES_MENU = 13;
 		Dataset ds = new Dataset(utilidades.IO.Fichero.nombreFich());
-		Clasificacion clasif = new Clasificacion();
+		Clasificacion clasif = new KNN();
+		
 
 		int option = 0;
 		do{
@@ -341,10 +350,11 @@ public class MyMain {
 					atributeInformationMenu(ds);
 					break;
 				case 5:
-					dataPreprocessingMenu(clasif);
+					// Cambiar
+					dataPreprocessingMenu(ds);
 					break;
 				case 6:
-					atributeWeightMenu(ds);
+					atributeWeightMenu(ds,clasif);
 					break;
 				
 				case 7:

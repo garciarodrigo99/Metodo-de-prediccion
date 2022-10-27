@@ -23,5 +23,5 @@ public interface TipoVotacion {
 	 * string-double.
 	 */
 	abstract String getTipo(ArrayList<Par<String,Double>> psd);
-	abstract String getNombreClasificación();
+	abstract String getNombre();
 }

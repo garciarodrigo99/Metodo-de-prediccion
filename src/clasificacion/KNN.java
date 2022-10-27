@@ -2,129 +2,76 @@ package clasificacion;
 
 import java.util.*;
 
-import clasificacion.distancia.Distancia;
-import clasificacion.distancia.Euclidea;
 import datos.*;
 import datos.atributo.Atributo;
 import utilidades.modificadores;
-import utilidades.preprocesado.PreprocesadoDatos;
-import utilidades.preprocesado.RangoZeroOne;
+import clasificacion.votacion.*;
+import clasificacion.pesadocasos.*;
 
-public class KNN {
+public class KNN implements Clasificacion{
 	static public Integer valork = 3;
-	protected Distancia distancia_ = new Euclidea();
-	protected PreprocesadoDatos preprocesado = new RangoZeroOne();
-	//protected int momento_ejec = 0; //Antes o después procesar los datos
-	
+	private TipoVotacion tvotacion = new MayoriaSimple();
+	private PesadoCasos pcasos = new IgualdadVotos();
+	private Entorno entorno;
+	private int momento_ejec;
+
 	public KNN() {}
-	
-//	public KNN(int size){
-//		for (int i = 0; i < size; i++) {
-//			pesoAtrib.add(CTE_PESO);
-//		}
-//	}
-	
-	public KNN(Distancia d){
-		distancia_ = d;
-	}
-	
-	public KNN(PreprocesadoDatos p){
-		preprocesado = p;
-	}
-	
-	public KNN(int n, Distancia d){
-		this(d);
-		valork = n;
-	}
-	
-	public KNN(int n, PreprocesadoDatos p){
-		this(p);
-		valork = n;
-	}
-	
-	public KNN(Distancia d, PreprocesadoDatos p){
-		this(d);
-		preprocesado = p;
-	}
-	
-	public KNN(int n, Distancia d, PreprocesadoDatos p){
-		valork = n;
-		distancia_ = d;
-		preprocesado = p;
-	}
 
-	public int getValorK() {
-		return valork;
-	}
-	
-//	public void setValorK(int i) {
-//		valork = i;
-//	}
-	
-	public Distancia getDistancia() {
-		return distancia_;
-	}
-	
-	public void setDistancia(Distancia d) {
-		distancia_ = d;
-	}
-	
-	public PreprocesadoDatos getPreprocesadoDatos() {
-		return preprocesado;
-	}
-	
-	public void setPreprocesadoDatos(PreprocesadoDatos p) {
-		preprocesado = p;
-	}
-	
-	/*
-	 * Instancia a comparar introducida por el usuario.
-	 */
-	//- Cannot make a static reference to the non-static field distancia_
-	// Intentar crear una clase static en modificadores y llamarla desde aquí
-	public ArrayList<ParID> getVecinos(ArrayList<Atributo> param, int k, Instancia inst) {
-		assert param.size()<=k;
-		ArrayList<ParID> distancias = new ArrayList<ParID>();
-		Instancia inst_aux = new Instancia(inst);
-		ArrayList<Atributo> arr_atrib_aux = new ArrayList<Atributo>(modificadores.copiaCrudaArAtrib(param));
-
-		// 0 por poner un número (siempre debería haber al menos 1) para recorrer el bucle ya que no tenemos numero de filas aqui.
-		for(int i=0;i<arr_atrib_aux.get(0).getSize();i++) {
-			distancias.add(new ParID(Instancia.getInstancia(arr_atrib_aux, i), 
-					distancia_.calcularDistancia(Instancia.getInstancia(arr_atrib_aux, i), inst_aux)));
-		}
-//		for(int i=0;i<distancias.size();i++) {
-//			System.out.print("("+(i+1)+")");
-//			distancias.get(i).print();
-//			System.out.print("\n");
-//		}
-		//Ordenar el vector de par por la distancia
-		Collections.sort(distancias, new Comparator<ParID>() {
-            public int compare(ParID p1, ParID p2) {
-                    return p1.getDistancia().compareTo(p2.getDistancia());
-             }
-		});
-		//Descomentar para imprimir todos las instancias por orden
-//		for(int i=0;i<distancias.size();i++) {
-//			distancias.get(i).print();
-//			System.out.print("\n");
-//		}
-		ArrayList<ParID> vecinos_cercanos = new ArrayList<ParID>();
-		for(int i=0;i<k;i++) {
-			vecinos_cercanos.add(ParID.copiaCruda(distancias.get(i)));
-		}
-		return vecinos_cercanos;
-	}
-	
-	
-	public ArrayList<ParID> getVecinos(ArrayList<Atributo> param,Instancia inst) {
-		return getVecinos(modificadores.copiaCrudaArAtrib(param),valork,Instancia.copiaInstancia(inst));
-	}
-	
 	public void getInfo() {
 		System.out.print("Número de vecinos (valor k): "+valork);
-		System.out.print("\tMétrica utilizada(distancia): "+distancia_.getNombre());
-		System.out.print("\tPreprocesado de datos: "+preprocesado.getNombre()+"\n");
+		System.out.print("Tipo de votacion: "+tvotacion.getNombre());
+		System.out.print("Pesado de casos: "+pcasos.getNombre());
+		entorno.getInfo();
 	}
 	
+	public void setVotacion(TipoVotacion paramVotacion) {
+		tvotacion = paramVotacion;
+	}
+
+	public String getVotacion() {
+		return tvotacion.getNombre();
+	}
+
+	public void setPesadoCasos(PesadoCasos paramPCasos) {
+		pcasos = paramPCasos;
+	}
+
+	public String getPesadoCasos(PesadoCasos paramPCasos) {
+		return pcasos.getNombre();
+	}
+
+	public Entorno getEntorno () {
+		return entorno;
+	}
+
+	public void setMomento(int paramMomento) {
+		momento_ejec = paramMomento;
+	}
+
+	public int getMomento(){
+		return momento_ejec;
+	}
+
+	@Override
+	public String clasificar(ArrayList<Atributo> ala, Instancia inst) {
+		//ArrayList<Atributo> arr_atrib; ¡Descomentar!
+		ArrayList<Atributo> arr_atrib = new ArrayList<Atributo>(ala);// Aux, borrar
+		/* Descomentar
+		if(momento_ejec==0) {	//Preprocesa los datos con el valor de la instancia
+			//Preproceso el array de atributos con la instancia como parte de él (instancia ocupa la última posición)
+			arr_atrib = new ArrayList<Atributo>(modificadores.copiaCrudaArAtrib(entorno_.getKnn().getPreprocesadoDatos().getPreprocesado(ala,inst))); //Array Atrib
+			
+		} else{	//Preprocesa los datos del array y luego vuelve a procesar con la instancia
+			arr_atrib = new ArrayList<Atributo>(modificadores.copiaCrudaArAtrib(entorno_.getKnn().getPreprocesadoDatos().getPreprocesado(ala))); //Array Atrib
+			arr_atrib = new ArrayList<Atributo>(modificadores.copiaCrudaArAtrib(entorno_.getKnn().getPreprocesadoDatos().getPreprocesado(arr_atrib,inst)));
+		}*/
+		//Guardo la instancia preprocesada
+		Instancia newInst = new Instancia(Instancia.copiaInstancia(Instancia.getInstancia(arr_atrib, arr_atrib.get(0).getSize()-1))); //Inst
+//		System.out.print("Instancia: ");inst.print();	//Descomentar para ver instancia preprocesada
+//		System.out.println();
+		//Se elimina la instancia añadida recientemente del objeto array de atributos para que no se incluya como una instancia propia del dataset
+		arr_atrib = new ArrayList<Atributo>(modificadores.copiaCrudaArAtrib(modificadores.EliminarInstancia(arr_atrib, (arr_atrib.get(0).getSize()-1))));
+		return tvotacion.getTipo(pcasos.getVotos(entorno.getKNearestNeighbours(arr_atrib,valork, newInst)));
+	}
+
 }

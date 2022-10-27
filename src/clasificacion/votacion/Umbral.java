@@ -31,7 +31,7 @@ public class Umbral implements TipoVotacion{
 		return modificadores.getTipo(psd, umbral_);
 	}
 	
-	public String getNombreClasificación() {
+	public String getNombre() {
 		return ("Umbral: "+String.valueOf(umbral_));
 	}
 }

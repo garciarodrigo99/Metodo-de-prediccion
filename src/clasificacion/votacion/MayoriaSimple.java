@@ -14,7 +14,7 @@ public class MayoriaSimple implements TipoVotacion{
 		return modificadores.getTipo(psd, UMBRAL);
 	}
 	
-	public String getNombreClasificación() {
+	public String getNombre() {
 		return "Mayoría simple";
 	}
 }

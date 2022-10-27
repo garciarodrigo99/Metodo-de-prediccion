@@ -5,6 +5,8 @@ import datos.atributo.A_categorico;
 import datos.atributo.A_numerico;
 import datos.atributo.Atributo;
 import utilidades.*;
+import utilidades.preprocesado.PreprocesadoDatos;
+import utilidades.preprocesado.RangoZeroOne;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -14,9 +16,8 @@ import java.io.FileNotFoundException;
 public class Dataset {
 	protected int numFil;
 	protected int numCol;
+	protected PreprocesadoDatos preproc = new RangoZeroOne();
 	protected ArrayList<Atributo> matriz = new ArrayList<>();
-	protected ArrayList<Double> pesoAtrib = new ArrayList<>();
-	static double CTE_PESO = 1.0;
 	
 	public Dataset(String file_name) {
 		String separador = ",";
@@ -33,7 +34,6 @@ public class Dataset {
 				String[] fila = line.split(separador);
 				for(int i = 0; i < (fila.length - 1); i++) {
 					matriz.add(new A_numerico(fila[i]));
-					pesoAtrib.add(CTE_PESO);
 				}
 				matriz.add(new A_categorico(fila[fila.length - 1]));
 			}
@@ -77,7 +77,6 @@ public class Dataset {
 	 */
 	public Dataset(Dataset ds_param) {
 		this.matriz = modificadores.copiaCrudaArAtrib(ds_param.getMatriz());
-		this.pesoAtrib = modificadores.copiaCruda(pesoAtrib);
 		this.numCol = ds_param.getNumCol();
 		this.numFil = ds_param.getNumFil();
 	}
@@ -88,6 +87,14 @@ public class Dataset {
 	
 	public int getNumCol() {
 		return numCol;
+	}
+
+	public String getDataPreprocessingMetric() {
+		return preproc.getNombre();
+	}
+
+	public void setDataPreprocessingMetric(PreprocesadoDatos paramPreProc) {
+		preproc = paramPreProc;
 	}
 
 	/**
@@ -117,14 +124,6 @@ public class Dataset {
 	 */
 	public Instancia getInstancia(int index) {
 		return Instancia.getInstancia(matriz, index);
-	}	
-	
-	public void modificarPesos(int index, double new_peso) {
-		pesoAtrib.set(index, new_peso);
-	}
-	
-	public Double getPesoAtrib(int index) {
-		return pesoAtrib.get(index);
 	}
 
 	/**
@@ -138,12 +137,6 @@ public class Dataset {
 		 * referencia y uno una copia cruda. Se peude comprobar descomentando la linea anterior y sustituyendolo por la parte de abajo
 		 */
 		ArrayList<Atributo> aux = new ArrayList<Atributo>(modificadores.copiaCrudaArAtrib(matriz));
-		
-		//System.out.print("Imprimiendo matriz con pesos actualizados:\n");
-		for(int i=0;i<numCol-1;i++) {
-			A_numerico atn = (A_numerico) aux.get(i);
-			atn.modify(modificadores.multiplyAllMembers(atn.getArr(), pesoAtrib.get(i)));
-		}
 		return aux;
 	}
 	
@@ -151,6 +144,6 @@ public class Dataset {
 //	
 //	public void removeInstancia() {}
 //	
-//	public void modInstancia() {}
+//	public void modifyInstancia() {}
 	
 }
