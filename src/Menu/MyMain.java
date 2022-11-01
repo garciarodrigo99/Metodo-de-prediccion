@@ -14,6 +14,11 @@ import experimentation.confusionMatrix;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
+import java.io.File;
 import java.io.FileWriter;   // Import the FileWriter class
 import java.io.IOException;  // Import the IOException class to handle errors
 import java.time.Duration;
@@ -314,10 +319,13 @@ public class MyMain {
 	private static void clasifConfig(ArrayList<Clasificacion> vectorClasifConfig, int k) {
 
 		ArrayList<Integer> vectorKValues = new ArrayList<>();
-		for(int i=3;i<=(3+(k/20));i++) {
+		int ksr = (int)Math.sqrt(k);
+		int halfRange = (k / 20) / 2;
+		for(int i=(ksr-halfRange);i<=(ksr+halfRange);i++) {
 			vectorKValues.add(i);
 		}
 		System.out.println(vectorKValues.size());
+		System.out.println(vectorKValues);
 
 		ArrayList<Distancia> vectorDistance = new ArrayList<>(
 			Arrays.asList(new Euclidea(), new Manhattan(), new Chebychef())
@@ -336,7 +344,6 @@ public class MyMain {
 		System.out.println(vectorUmbral.size());
 
 		for(int iteratorK = 0;iteratorK<vectorKValues.size();iteratorK++) {
-			System.out.println("-------------------------------------"+"Iteracion con "+vectorKValues.get(iteratorK)+" -------------------------------------");
 			for(int iteratorDistance = 0;iteratorDistance<vectorDistance.size();iteratorDistance++) {
 				for(int iteratorPesadoCasos = 0;iteratorPesadoCasos<vectorPesado.size();iteratorPesadoCasos++) {
 					for(int iteratorUmbral = 0;iteratorUmbral<vectorUmbral.size();iteratorUmbral++) {
@@ -358,6 +365,9 @@ public class MyMain {
 				}
 			}	
 		}
+		for(int i=0;i<vectorClasifConfig.size();i++) {
+			System.out.println(vectorClasifConfig.get(i).getCsvValues());
+		}
 	}
 	
 	/*
@@ -366,12 +376,8 @@ public class MyMain {
 	public static void main(String[] args) {
 		final int OPCIONES_MENU = 17;
 		Dataset ds = new Dataset(utilidades.IO.Fichero.nombreFich());
-		System.out.print("Hola");
-		System.out.print("\b");
-		System.out.print("Adios");
 		Clasificacion clasif = new KNN();
 		ArrayList<Clasificacion> vectorClasifConfig = new ArrayList<Clasificacion>();
-		
 
 		int option = 0;
 		do{
@@ -483,7 +489,7 @@ public class MyMain {
 					Arrays.asList("Iris-setosa","Iris-versicolor","Iris-virginica",
 							modificadores.labelUnclasified));
 				    try {
-				        FileWriter myWriter = new FileWriter("square_matrix.txt");
+				        FileWriter myWriter = new FileWriter("total_elements.txt");
 						Instant startFor = Instant.now();
 						myWriter.write(KNN.getLabels()+",Prec_pred"+"\n");
 						int sum = 0;
@@ -492,7 +498,7 @@ public class MyMain {
 							for(int j=0;j<ds.copia().get(0).getSize();j++) {
 								myMatrix.addValue(ds.getInstancia(j).getAtCat().at(0), vectorClasifConfig.get(i).clasificar(ds.copia(), ds.getInstancia(j)));
 							}
-							double prec_predict = (double)myMatrix.getSumMainDiagonal()/(double)myMatrix.getElementsSquareMatrix();
+							double prec_predict = (double)myMatrix.getSumMainDiagonal()/(double)myMatrix.getTotalElements();
 							if (prec_predict >= 0.9) {
 								sum++;
 								System.out.println(sum+": "+i);
@@ -506,6 +512,16 @@ public class MyMain {
 				    } catch (IOException e) {
 				    	System.out.println("An error occurred.");
 				    	e.printStackTrace();
+				    }
+				    try {
+				        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("morse_end.wav").getAbsoluteFile());
+				        Clip clip = AudioSystem.getClip();
+				        clip.open(audioInputStream);
+				        clip.start();
+				        // If you want the sound to loop infinitely, then put: clip.loop(Clip.LOOP_CONTINUOUSLY); 
+				        // If you want to stop the sound, then use clip.stop();
+				    } catch (Exception ex) {
+				        ex.printStackTrace();
 				    }
 					break;
 					
