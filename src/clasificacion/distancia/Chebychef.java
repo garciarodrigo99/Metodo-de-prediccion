@@ -10,9 +10,9 @@ public class Chebychef implements Distancia{
 	private String nombre = "Chebychef";
 	
 	@Override
-	public double calcularDistancia(Instancia inst_saved, Instancia ins_toknow,
+	public Double calcularDistancia(Instancia inst_saved, Instancia ins_toknow,
 			ArrayList<Double> ponderations) {
-		return matematicas.Chebychef(inst_saved,inst_saved);
+		return matematicas.Chebychef(inst_saved,ins_toknow);
 	}
 	
 	@Override

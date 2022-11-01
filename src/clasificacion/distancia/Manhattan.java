@@ -10,9 +10,9 @@ public class Manhattan implements Distancia{
 	private String nombre = "Manhattan";
 	
 	@Override
-	public double calcularDistancia(Instancia inst_saved, Instancia ins_toknow,
+	public Double calcularDistancia(Instancia inst_saved, Instancia ins_toknow,
 			ArrayList<Double> ponderations) {
-		return matematicas.Manhattan(inst_saved,inst_saved);
+		return matematicas.Manhattan(inst_saved,ins_toknow);
 	}
 	
 	@Override

@@ -11,15 +11,22 @@ import datos.atributo.*;
 
 
 public class Entorno {
-	private ArrayList<Double> pesoAtrib;
+	private ArrayList<Double> pesoAtrib = new ArrayList<>();
 	private final double defaultPesoAtrib = 1.0;
 	private Distancia distancia_ = new Euclidea();
 
 	public Entorno() {}
 
-	public void getInfo() {
-		System.out.println("Pesado de casos: "+pesoAtrib);
-		System.out.println("Métrica distancia: "+distancia_.getNombre());
+	public String getInfo() {
+		return (" Pesos atributos: "+pesoAtrib+" Métrica distancia: "+distancia_.getNombre());
+	}
+	
+	public static String getLabels() {
+		return ("P_Atrib"+","+"Distance");
+	}
+	
+	public String getCsvValues() {
+		return (pesoAtrib+","+distancia_.getNombre());
 	}
 
 	public void BuildPesoAtrib (int nAtrib) {
@@ -58,7 +65,6 @@ public class Entorno {
 		ArrayList<ParID> distancias = new ArrayList<ParID>();
 		Instancia inst_aux = new Instancia(inst);
 		ArrayList<Atributo> arr_atrib_aux = new ArrayList<Atributo>(modificadores.copiaCrudaArAtrib(param));
-
 		// 0 por poner un número (siempre debería haber al menos 1) para recorrer el bucle ya que no tenemos numero de filas aqui.
 		for(int i=0;i<arr_atrib_aux.get(0).getSize();i++) {
 			distancias.add(new ParID(Instancia.getInstancia(arr_atrib_aux, i), 

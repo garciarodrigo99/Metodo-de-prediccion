@@ -6,9 +6,18 @@ import clasificacion.pesadocasos.*;
 import clasificacion.votacion.*;
 import datos.*;
 import datos.atributo.*;
+import utilidades.matematicas;
+import utilidades.modificadores;
 import utilidades.preprocesado.*;
+import experimentation.confusionMatrix;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+
+import java.io.FileWriter;   // Import the FileWriter class
+import java.io.IOException;  // Import the IOException class to handle errors
+import java.time.Duration;
+import java.time.Instant;
 
 
 public class MyMain {
@@ -90,7 +99,7 @@ public class MyMain {
 		}
 		do {
 			System.out.print("\nMostrando pesos: "+"\n");
-			for(int i=0;i<paramDataset.getNumCol();i++) {
+			for(int i=0;i<paramDataset.getNumCol()-1;i++) {
 				System.out.print("Peso de "+paramDataset.at(i).getNombre()+": "+
 										((KNN)paramClasif).getEntorno().GetPesoAtrib().get(i)+"\t");
 			}
@@ -117,11 +126,12 @@ public class MyMain {
 				((KNN)paramClasif).getEntorno().ModifyPesoAtrib(menuOpt-1, peso);
 			}
 			if(menuOpt == (menuEnd - 1)){
-				System.out.println("Imprimiendo dataset modificado: ");
-				ArrayList<Atributo> ald = paramDataset.copia();
-				for(int i=0; i<paramDataset.getNumFil(); i++) {
-					Instancia.getInstancia(ald, i).print();
-				}
+				System.out.println("Comentado");
+//				System.out.println("Imprimiendo dataset modificado: ");
+//				ArrayList<Atributo> ald = paramDataset.copia();
+//				for(int i=0; i<paramDataset.getNumFil(); i++) {
+//					Instancia.getInstancia(ald, i).print();
+//				}
 			}
 		}while(menuOpt!=menuEnd);
 	}
@@ -142,7 +152,7 @@ public class MyMain {
 					while((kOption<menuStart)||(kOption>paramDataset.getNumFil())) {
 						kOption=utilidades.IO.Opcion.getOpcionInt("Introduzca el nuevo valor de k: ");
 					}
-					((KNN)paramClasif).valork = kOption;
+					((KNN)paramClasif).setKNeighbours(kOption);
 					break;
 				case 2:
 					break;
@@ -235,7 +245,7 @@ public class MyMain {
 				case (menuStart + 1): {
 					double umbralOption = -1.0;
 					while((umbralOption<0.0)||(umbralOption>1.0)) {
-					String enterkey = utilidades.IO.Opcion.getOpcionString("Introduzca umbral de aceptación (0-1,dos decimales): ");
+					String enterkey = utilidades.IO.Opcion.getOpcionString("Introduzca umbral de aceptación (0-1.Dos decimales(Punto)): ");
 					if(enterkey.isEmpty()) {
 						umbralOption = Umbral.UMBRAL;
 					} else
@@ -254,13 +264,13 @@ public class MyMain {
 	}
 	
 	private static void checkInstanceMenu(Dataset paramDataset, 
-																				Clasificacion paramClasif) {
-		int menuOption=0;
-		final int menuStart=1;
-		final int menuEnd=3;
+										Clasificacion paramClasif) {
+		int menuOption=-1;
+		final int menuStart=0;
+		final int menuEnd=2;
 		int auxVariable=0;
 		//Meter instancia por fichero
-		if(!(paramDataset.getDataPreprocessingMetric().equals(DatosCrudos.getNombreStatic()))) {
+		if(!(paramDataset.getDataPreprocessingMetric().getNombre().equals(DatosCrudos.getNombreStatic()))) {
 			do {
 				System.out.println("¿Desea procesar los datos antes o después de introducir la instancia?");
 				optionMenuFormat(menuStart,"Antes");
@@ -269,7 +279,7 @@ public class MyMain {
 				exitPrint(menuEnd);
 				menuOption=utilidades.IO.Opcion.getOpcionInt();
 				if((menuOption==menuStart)||(menuOption==(menuStart+1))) {
-					auxVariable = menuOption - 1;
+					auxVariable = menuOption;
 					menuOption=menuEnd;
 				}
 			}while(menuOption!=menuEnd);
@@ -292,19 +302,75 @@ public class MyMain {
 					inst = new Instancia(Instancia.leerInstancia(paramDataset.getNumCol()));
 				}
 				((KNN)paramClasif).setMomento(auxVariable);
+				System.out.println("¿Instancia?");
+				inst.print();
+				System.out.println("[MyMain]");
 				System.out.println("Instancia clasificada como: "+paramClasif.clasificar(paramDataset.copia(), inst));
 				menuOption=menuEnd;
 			}
 		}while(menuOption!=menuEnd);
 	}
 	
+	private static void clasifConfig(ArrayList<Clasificacion> vectorClasifConfig, int k) {
+
+		ArrayList<Integer> vectorKValues = new ArrayList<>();
+		for(int i=3;i<=(3+(k/20));i++) {
+			vectorKValues.add(i);
+		}
+		System.out.println(vectorKValues.size());
+
+		ArrayList<Distancia> vectorDistance = new ArrayList<>(
+			Arrays.asList(new Euclidea(), new Manhattan(), new Chebychef())
+		);
+		System.out.println(vectorDistance.size());
+
+		ArrayList<PesadoCasos> vectorPesado = new ArrayList<>(
+			Arrays.asList(new Cercania(), new IgualdadVotos())// Añadir voto fijo
+		);
+		System.out.println(vectorPesado.size());
+
+		ArrayList<Double> vectorUmbral = new ArrayList<>(
+			Arrays.asList(0.5,0.55,0.6,0.65,(2.0/3.0),0.7,0.75,
+			0.8,0.85,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99,1.0)
+			);
+		System.out.println(vectorUmbral.size());
+
+		for(int iteratorK = 0;iteratorK<vectorKValues.size();iteratorK++) {
+			System.out.println("-------------------------------------"+"Iteracion con "+vectorKValues.get(iteratorK)+" -------------------------------------");
+			for(int iteratorDistance = 0;iteratorDistance<vectorDistance.size();iteratorDistance++) {
+				for(int iteratorPesadoCasos = 0;iteratorPesadoCasos<vectorPesado.size();iteratorPesadoCasos++) {
+					for(int iteratorUmbral = 0;iteratorUmbral<vectorUmbral.size();iteratorUmbral++) {
+						Clasificacion nClasif = new KNN();
+						((KNN)nClasif).setKNeighbours(vectorKValues.get(iteratorK));
+						((KNN)nClasif).getEntorno().SetDistanceMetric(vectorDistance.get(iteratorDistance));
+						((KNN)nClasif).setPesadoCasos(vectorPesado.get(iteratorPesadoCasos));
+						((KNN)nClasif).setVotacion(new Umbral(vectorUmbral.get(iteratorUmbral)));
+						vectorClasifConfig.add(nClasif);
+					}
+				}
+				for(int iteratorUmbral = 0;iteratorUmbral<vectorUmbral.size();iteratorUmbral++) {
+					Clasificacion nClasif = new KNN();
+					((KNN)nClasif).setKNeighbours(vectorKValues.get(iteratorK));
+					((KNN)nClasif).getEntorno().SetDistanceMetric(vectorDistance.get(iteratorDistance));
+				 	((KNN)nClasif).setPesadoCasos(new VotoFijo(((KNN)nClasif).valork));
+					((KNN)nClasif).setVotacion(new Umbral(vectorUmbral.get(iteratorUmbral)));
+					vectorClasifConfig.add(nClasif);
+				}
+			}	
+		}
+	}
+	
 	/*
 	 * Falta apartado 7 de la práctica 2 módulo de experimentación
 	 */
 	public static void main(String[] args) {
-		final int OPCIONES_MENU = 13;
+		final int OPCIONES_MENU = 17;
 		Dataset ds = new Dataset(utilidades.IO.Fichero.nombreFich());
+		System.out.print("Hola");
+		System.out.print("\b");
+		System.out.print("Adios");
 		Clasificacion clasif = new KNN();
+		ArrayList<Clasificacion> vectorClasifConfig = new ArrayList<Clasificacion>();
 		
 
 		int option = 0;
@@ -321,7 +387,8 @@ public class MyMain {
 			optionMenuFormat(9,"Seleccionar métrica pesado de casos (vecinos más cercanos)");
 			optionMenuFormat(10,"Especificar la regla de clasificación");
 			optionMenuFormat(11,"Mostrar información parámetros de configuración del algoritmo de clasificación");
-			optionMenuFormat(12,"Comprobar tipo de instancia");
+			optionMenuFormat(12,"Generar todas las configuraciones posibles");
+			optionMenuFormat(13,"Comprobar tipo de instancia");
 			exitPrint(OPCIONES_MENU);
 			System.out.println("");
 
@@ -374,11 +441,72 @@ public class MyMain {
 					break;
 					
 				case 11:
-					clasif.getInfo();
+					((KNN)clasif).getInfo();
 					break;
 					
 				case 12:
-					checkInstanceMenu(ds, clasif);
+					clasifConfig(vectorClasifConfig, ds.getNumFil());
+					System.out.println(vectorClasifConfig.size());
+					break;
+					
+				case 13:
+					//checkInstanceMenu(ds, clasif);
+					Instancia inst = new Instancia(Instancia.leerInstancia(ds.getNumCol()-1, "ins1.csv"));
+					if (vectorClasifConfig.size() > 0) {
+					    try {
+					        FileWriter myWriter = new FileWriter("test.txt");
+							Instant startFor = Instant.now();
+							myWriter.write(KNN.getLabels()+"\n");
+							for(int i=0;i<vectorClasifConfig.size();i++) {
+								String typeResult = vectorClasifConfig.get(i).clasificar(ds.copia(), inst);
+								if (typeResult.equals(inst.getAtCat().at(0))) {
+									myWriter.write(vectorClasifConfig.get(i).getCsvValues()+"\n");
+								}
+							    //myWriter.write("\nInstancia clasificada como: "+
+												//vectorClasifConfig.get(i).clasificar(ds.copia(), inst)+"\n\n");
+							}
+							Instant endFor = Instant.now();
+					        myWriter.close();
+							Duration timeFor = Duration.between(startFor, endFor);
+							System.out.println(timeFor.toSeconds()+" seconds.");
+				      } catch (IOException e) {
+				        System.out.println("An error occurred.");
+				        e.printStackTrace();
+				      }
+					} else {
+						System.out.println("Instancia clasificada como: "+clasif.clasificar(ds.copia(), inst));
+					}
+					//System.out.println("Instancia clasificada como: "+clasif.clasificar(ds.copia(), inst));
+					break;
+				case 14 :
+					ArrayList<String> cat = new ArrayList<String>(
+					Arrays.asList("Iris-setosa","Iris-versicolor","Iris-virginica",
+							modificadores.labelUnclasified));
+				    try {
+				        FileWriter myWriter = new FileWriter("square_matrix.txt");
+						Instant startFor = Instant.now();
+						myWriter.write(KNN.getLabels()+",Prec_pred"+"\n");
+						int sum = 0;
+						for(int i=0;i<vectorClasifConfig.size();i++) {
+							confusionMatrix myMatrix = new confusionMatrix(cat);
+							for(int j=0;j<ds.copia().get(0).getSize();j++) {
+								myMatrix.addValue(ds.getInstancia(j).getAtCat().at(0), vectorClasifConfig.get(i).clasificar(ds.copia(), ds.getInstancia(j)));
+							}
+							double prec_predict = (double)myMatrix.getSumMainDiagonal()/(double)myMatrix.getElementsSquareMatrix();
+							if (prec_predict >= 0.9) {
+								sum++;
+								System.out.println(sum+": "+i);
+								myWriter.write(vectorClasifConfig.get(i).getCsvValues()+","+prec_predict+"\n");
+							}
+						}
+						Instant endFor = Instant.now();
+				        myWriter.close();
+						Duration timeFor = Duration.between(startFor, endFor);
+						System.out.println(timeFor.toSeconds()+" seconds.");
+				    } catch (IOException e) {
+				    	System.out.println("An error occurred.");
+				    	e.printStackTrace();
+				    }
 					break;
 					
 				case OPCIONES_MENU: 

@@ -24,4 +24,5 @@ public interface TipoVotacion {
 	 */
 	abstract String getTipo(ArrayList<Par<String,Double>> psd);
 	abstract String getNombre();
+	abstract Double getLimit();
 }

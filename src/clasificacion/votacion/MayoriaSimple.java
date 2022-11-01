@@ -17,4 +17,8 @@ public class MayoriaSimple implements TipoVotacion{
 	public String getNombre() {
 		return "Mayoría simple";
 	}
+	
+	public Double getLimit() {
+		return UMBRAL;
+	}
 }

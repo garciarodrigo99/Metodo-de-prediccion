@@ -39,6 +39,6 @@ public class VotoFijo implements PesadoCasos{
 	
 	@Override
 	public String getNombre() {
-		return "Voto fijo";
+		return "Voto_fijo";
 	}
 }

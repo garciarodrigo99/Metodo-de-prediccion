@@ -79,6 +79,7 @@ public class Dataset {
 		this.matriz = modificadores.copiaCrudaArAtrib(ds_param.getMatriz());
 		this.numCol = ds_param.getNumCol();
 		this.numFil = ds_param.getNumFil();
+		this.preproc = ds_param.getDataPreprocessingMetric();
 	}
 	
 	public int getNumFil() {
@@ -89,8 +90,8 @@ public class Dataset {
 		return numCol;
 	}
 
-	public String getDataPreprocessingMetric() {
-		return preproc.getNombre();
+	public PreprocesadoDatos getDataPreprocessingMetric() {
+		return preproc;
 	}
 
 	public void setDataPreprocessingMetric(PreprocesadoDatos paramPreProc) {
@@ -140,10 +141,34 @@ public class Dataset {
 		return aux;
 	}
 	
-//	public void addInstancia() {}
+	public void addInstancia(Instancia paramInstance) {
+		assert(matriz.size()==paramInstance.getSize());
+		for(int i=0; i<matriz.size()-1;i++){
+			((A_numerico)matriz.get(i)).insert(paramInstance.getAtNum().at(i));
+		}
+		((A_categorico)matriz.get(matriz.size()-1)).insert(paramInstance.getAtCat().at(0));
+		numFil++;
+	}
 //	
-//	public void removeInstancia() {}
+	public void removeInstancia(int index) {
+		assert((index >= 0) && (index < numFil));
+		for(int i=0; i<matriz.size()-1;i++){
+			((A_numerico)matriz.get(i)).eliminarElemento(index);
+		}
+		((A_categorico)matriz.get(matriz.size()-1)).eliminarElemento(index);
+	}
 //	
 //	public void modifyInstancia() {}
+
+	public void addAttribute(Atributo paramAttribute) {
+		assert(numFil==paramAttribute.getSize());
+		matriz.add(paramAttribute);
+	}
+//	
+	public void removeAttribute(int n) {
+		matriz.remove(n);
+	}
+//	
+//	public void modifyAttribute() {}
 	
 }

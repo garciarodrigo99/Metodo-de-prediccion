@@ -6,5 +6,6 @@ import datos.Instancia;
 
 public interface Clasificacion {
 	abstract String clasificar(ArrayList<Atributo> ala, Instancia inst);
-	abstract void getInfo();
+	abstract String getInfo();
+	abstract String getCsvValues();
 }

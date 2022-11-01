@@ -34,4 +34,8 @@ public class Umbral implements TipoVotacion{
 	public String getNombre() {
 		return ("Umbral: "+String.valueOf(umbral_));
 	}
+	
+	public Double getLimit() {
+		return umbral_;
+	}
 }

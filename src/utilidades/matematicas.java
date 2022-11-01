@@ -81,10 +81,13 @@ public final class matematicas {
 	 * Euclidea sin instanciarla
 	 */
 	public static double Euclidea(ArrayList<Double> vector1, ArrayList<Double> vector2) {
+//		System.out.println(vector1);
+//		System.out.println(vector2);
 		assert vector1.size() == vector2.size();
 		double dist = 0.0;
 		for(int i=0; i<vector1.size();i++) {
 			dist += matematicas.Euclidea(vector1.get(i), vector2.get(i));
+			//System.out.println(dist);
 		}
 		return dist;
 	}
@@ -104,10 +107,13 @@ public final class matematicas {
 	 * Manhattan sin instanciarla
 	 */
 	public static double Manhattan(ArrayList<Double> vector1, ArrayList<Double> vector2) {
+//		System.out.println(vector1);
+//		System.out.println(vector2);
 		assert vector1.size() == vector2.size();
 		double dist = 0.0;
 		for(int i=0; i<vector1.size();i++) {
 			dist += Math.abs(vector1.get(i) - vector2.get(i));
+			//System.out.println(dist);
 		}
 		return dist;
 	}
@@ -121,11 +127,14 @@ public final class matematicas {
 	}
 	
 	public static double Chebychef(ArrayList<Double> vector1, ArrayList<Double> vector2) {
+//		System.out.println(vector1);
+//		System.out.println(vector2);
 		assert vector1.size() == vector2.size();
 		double dist = 0.0;
 		for(int i=0; i<vector1.size();i++) {
 			if(Math.abs(vector1.get(i) - vector2.get(i))>dist)
 				dist = Math.abs(vector1.get(i) - vector2.get(i));
+			//System.out.println(dist);
 		}
 		return dist;
 	}

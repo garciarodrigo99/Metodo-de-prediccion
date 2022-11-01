@@ -9,9 +9,9 @@ public class Euclidea implements Distancia{
 	private String nombre = "Euclidea";
 	
 	@Override
-	public double calcularDistancia(Instancia inst_saved, Instancia ins_toknow,
+	public Double calcularDistancia(Instancia inst_saved, Instancia ins_toknow,
 			ArrayList<Double> ponderations) {
-		return matematicas.Euclidea(inst_saved,inst_saved);
+		return matematicas.Euclidea(inst_saved,ins_toknow);
 	}
 	
 	@Override

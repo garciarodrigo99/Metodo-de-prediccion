@@ -17,6 +17,6 @@ public class IgualdadVotos implements PesadoCasos{
 	
 	@Override
 	public String getNombre() {
-		return "Igualdad de votos";
+		return "Igual_votos";
 	}
 }

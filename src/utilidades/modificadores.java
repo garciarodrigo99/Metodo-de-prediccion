@@ -13,6 +13,8 @@ public class modificadores {
 	
 	public static final DecimalFormat decform = new DecimalFormat("0.00");
 	
+	public static final String labelUnclasified = "no-clasificada";
+	
 	public static ArrayList<Double> multiplyAllMembers(ArrayList<Double> vector, double multiplicador){
 		ArrayList<Double> aux = new ArrayList<Double>(copiaCruda(vector));
 		for(int i=0; i<aux.size();i++) {
@@ -176,10 +178,10 @@ public class modificadores {
 			total_votos += psd.get(i).getElement1();
 		}
 		if(((total_votos>0) &&
-			(tipo.getElement1()/total_votos)>umbral)) {
+			(tipo.getElement1()/total_votos)>=umbral)) { // Umbral > 1.0 X
 			return tipo.getElement0();
 		} else
-			return "no-clasificada";
+			return labelUnclasified;
 	}
 	
 	public static ArrayList<String> getNombresUnicos(ArrayList<String> arrs){
