@@ -18,6 +18,8 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
+import algorithm_statics.algorithmspeedtester;
+
 import java.io.File;
 import java.io.FileWriter;   // Import the FileWriter class
 import java.io.IOException;  // Import the IOException class to handle errors
@@ -365,17 +367,27 @@ public class MyMain {
 				}
 			}	
 		}
-		for(int i=0;i<vectorClasifConfig.size();i++) {
-			System.out.println(vectorClasifConfig.get(i).getCsvValues());
-		}
 	}
 	
+	private static void playClip(String clipName) {
+	    try {
+	        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(clipName).getAbsoluteFile());
+	        Clip clip = AudioSystem.getClip();
+	        clip.open(audioInputStream);
+	        clip.start();
+	        // If you want the sound to loop infinitely, then put: clip.loop(Clip.LOOP_CONTINUOUSLY); 
+	        // If you want to stop the sound, then use clip.stop();
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	    }
+	}
 	/*
 	 * Falta apartado 7 de la práctica 2 módulo de experimentación
 	 */
 	public static void main(String[] args) {
 		final int OPCIONES_MENU = 17;
-		Dataset ds = new Dataset(utilidades.IO.Fichero.nombreFich());
+		String dataset_file_name = utilidades.IO.Fichero.nombreFich();
+		Dataset ds = new Dataset(dataset_file_name);
 		Clasificacion clasif = new KNN();
 		ArrayList<Clasificacion> vectorClasifConfig = new ArrayList<Clasificacion>();
 
@@ -395,6 +407,8 @@ public class MyMain {
 			optionMenuFormat(11,"Mostrar información parámetros de configuración del algoritmo de clasificación");
 			optionMenuFormat(12,"Generar todas las configuraciones posibles");
 			optionMenuFormat(13,"Comprobar tipo de instancia");
+			optionMenuFormat(14,"Comparador algoritmos KNN");
+			optionMenuFormat(15,"Macroexperimentacion(opcion 12 requerida previamente)");
 			exitPrint(OPCIONES_MENU);
 			System.out.println("");
 
@@ -402,7 +416,8 @@ public class MyMain {
 
 			switch(option) {
 				case 1:
-					ds = new Dataset(utilidades.IO.Fichero.nombreFich());
+					dataset_file_name = utilidades.IO.Fichero.nombreFich();
+					ds = new Dataset(dataset_file_name);
 					break;
 				case 2:
 					for(int i=0; i<ds.getNumFil(); i++) {
@@ -457,7 +472,7 @@ public class MyMain {
 					
 				case 13:
 					//checkInstanceMenu(ds, clasif);
-					Instancia inst = new Instancia(Instancia.leerInstancia(ds.getNumCol()-1, "ins1.csv"));
+					Instancia inst = new Instancia(Instancia.leerInstancia(ds.getNumCol()-1, "ins2.csv"));
 					if (vectorClasifConfig.size() > 0) {
 					    try {
 					        FileWriter myWriter = new FileWriter("test.txt");
@@ -485,11 +500,32 @@ public class MyMain {
 					//System.out.println("Instancia clasificada como: "+clasif.clasificar(ds.copia(), inst));
 					break;
 				case 14 :
-					ArrayList<String> cat = new ArrayList<String>(
-					Arrays.asList("Iris-setosa","Iris-versicolor","Iris-virginica",
-							modificadores.labelUnclasified));
+					if (dataset_file_name.equals("glass.csv")) {
+						Instancia aux = new Instancia(Instancia.leerInstancia(ds.getNumCol()-1, "ins2.csv"));
+						int iterator = 0;
+						while (iterator < 5) {
+							algorithmspeedtester.knnTimeNreps(ds.copia(), (int)Math.sqrt(ds.getNumFil()), aux, 10000);
+							System.out.println();
+							iterator++;
+						}
+					} else {
+						Instancia aux = new Instancia(Instancia.leerInstancia(ds.getNumCol()-1, "ins1.csv"));
+						int iterator = 0;
+						while (iterator < 5) {
+							algorithmspeedtester.knnTimeNreps(ds.copia(), (int)Math.sqrt(ds.getNumFil()), aux, 1000);
+							System.out.println();
+							iterator++;
+						}
+					}
+					playClip("morse_end.wav");
+					break;
+				case 15 :
+					ArrayList<String> cat = new ArrayList<String>(ds.getUniqueTypes());
+					cat.add(modificadores.labelUnclasified);
+					double acceptPredict = 0.75;
+					System.out.println(cat);
 				    try {
-				        FileWriter myWriter = new FileWriter("total_elements.txt");
+				        FileWriter myWriter = new FileWriter("total_elements_2_"+(int)(acceptPredict*100)+"_"+dataset_file_name.replaceFirst(".csv", "")+".csv");
 						Instant startFor = Instant.now();
 						myWriter.write(KNN.getLabels()+",Prec_pred"+"\n");
 						int sum = 0;
@@ -499,10 +535,12 @@ public class MyMain {
 								myMatrix.addValue(ds.getInstancia(j).getAtCat().at(0), vectorClasifConfig.get(i).clasificar(ds.copia(), ds.getInstancia(j)));
 							}
 							double prec_predict = (double)myMatrix.getSumMainDiagonal()/(double)myMatrix.getTotalElements();
-							if (prec_predict >= 0.9) {
+							if (prec_predict >= acceptPredict) {
 								sum++;
-								System.out.println(sum+": "+i);
+								System.out.println(i+": "+sum);
 								myWriter.write(vectorClasifConfig.get(i).getCsvValues()+","+prec_predict+"\n");
+							} else {
+								System.out.println(i);
 							}
 						}
 						Instant endFor = Instant.now();
@@ -513,16 +551,7 @@ public class MyMain {
 				    	System.out.println("An error occurred.");
 				    	e.printStackTrace();
 				    }
-				    try {
-				        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("morse_end.wav").getAbsoluteFile());
-				        Clip clip = AudioSystem.getClip();
-				        clip.open(audioInputStream);
-				        clip.start();
-				        // If you want the sound to loop infinitely, then put: clip.loop(Clip.LOOP_CONTINUOUSLY); 
-				        // If you want to stop the sound, then use clip.stop();
-				    } catch (Exception ex) {
-				        ex.printStackTrace();
-				    }
+				    playClip("morse_end.wav");
 					break;
 					
 				case OPCIONES_MENU: 

@@ -4,8 +4,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 
+import datos.Instancia;
+import datos.atributo.Atributo;
 import utilidades.matematicas;
 import utilidades.modificadores;
+
+import clasificacion.Entorno;
 
 //https://www.geeksforgeeks.org/java-program-to-handle-divide-by-zero-and-multiple-exceptions/
 
@@ -16,11 +20,6 @@ public class algorithmspeedtester {
 	public static final String T_MILLI = "Tiempo en milisegundos: ";
 	public static final String T_SEC = "Tiempo en segundos: ";
 	public static final String T_MIN = "Tiempo en minutos: ";
-	
-	
-//	public static void variance_comparator(ArrayList<Double> lista) {
-//		variance_comparator(lista,1);
-//	}
 	
 	public static void variance_comparator(ArrayList<Double> lista, int opt) {
 		switch (opt) {
@@ -253,9 +252,94 @@ public class algorithmspeedtester {
 		}
 	}
 	
+	public static void knnTimeNreps(ArrayList<Atributo> param, int k, Instancia inst, int n) {
+		int n_pruebas = n;
+		int iterator = 0;
+		Entorno auxEntorno = new Entorno();
+		Instant start_alg_1 = Instant.now();
+		while (iterator<n_pruebas) {
+			auxEntorno.getKNN2(param, k, inst);
+			iterator++;
+		}
+		Instant end_alg_1 = Instant.now();
+		Duration timeElapsed_alg_1 = Duration.between(start_alg_1, end_alg_1);
+		
+		iterator = 0;
+		Instant start_alg_2 = Instant.now();
+		while (iterator<n_pruebas) {
+			auxEntorno.getKNearestNeighbours(param, k, inst);
+			iterator++;
+		}
+		Instant end_alg_2 = Instant.now();
+		Duration timeElapsed_alg_2 = Duration.between(start_alg_2,
+													end_alg_2);
+	
+		switch (n_pruebas) {
+			case 10: {
+				System.out.println(n_pruebas+PRUEBAS);
+				displayTime(timeElapsed_alg_1,timeElapsed_alg_2,0);
+				calculateTime(timeElapsed_alg_1,timeElapsed_alg_2,0);
+				break;
+			}
+			case 100: {
+				System.out.println(n_pruebas+PRUEBAS);
+				displayTime(timeElapsed_alg_1,timeElapsed_alg_2,0);
+				calculateTime(timeElapsed_alg_1,timeElapsed_alg_2,0);
+				break;
+			}
+			case 1000: {
+				System.out.println("1k pruebas"+PRUEBAS);
+				displayTime(timeElapsed_alg_1,timeElapsed_alg_2,1);
+				calculateTime(timeElapsed_alg_1,timeElapsed_alg_2,1);
+				break;
+			}
+			case 10000: {
+				System.out.println("10k pruebas"+PRUEBAS);
+				displayTime(timeElapsed_alg_1,timeElapsed_alg_2,1);
+				calculateTime(timeElapsed_alg_1,timeElapsed_alg_2,1);
+				break;
+			}
+			case 100000: {
+				System.out.println("100k pruebas"+PRUEBAS);
+				displayTime(timeElapsed_alg_1,timeElapsed_alg_2,1);
+				calculateTime(timeElapsed_alg_1,timeElapsed_alg_2,1);
+				break;
+			}
+			case 1000000: {
+				System.out.println("1M pruebas"+PRUEBAS);
+				displayTime(timeElapsed_alg_1,timeElapsed_alg_2,2);
+				calculateTime(timeElapsed_alg_1,timeElapsed_alg_2,2);
+				break;
+			}
+			// Tiempo 2-3 seg
+			// 2000-3000 mseg
+			case 10000000: {
+				System.out.println("10M pruebas"+PRUEBAS);
+				displayTime(timeElapsed_alg_1,timeElapsed_alg_2,3);
+				calculateTime(timeElapsed_alg_1,timeElapsed_alg_2,2);
+				break;
+			}
+			case 100000000: {
+				System.out.println("100M pruebas"+PRUEBAS);
+				displayTime(timeElapsed_alg_1,timeElapsed_alg_2,3);
+				calculateTime(timeElapsed_alg_1,timeElapsed_alg_2,2);
+				break;
+			}
+			case 1000000000: {
+				System.out.println("1kM pruebas"+PRUEBAS);
+				displayTime(timeElapsed_alg_1,timeElapsed_alg_2,3);
+				calculateTime(timeElapsed_alg_1,timeElapsed_alg_2,2);
+				break;
+			}
+			default:
+				break;
+		}
+
+	}
+	
 	private static void displayTime(Duration alg_1, Duration alg_2, int option) {
 		final String CADENA_1 = "Algoritmo 1: ";
-		final String CADENA_2 = "\\nAlgoritmo 2: ";
+		final String CADENA_2 = "Algoritmo 2: ";
 		switch (option) {
 			case 0: {
 				System.out.println(T_NANO+"\n"+

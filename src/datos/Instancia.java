@@ -186,17 +186,16 @@ public class Instancia{
 		String tipo = new String("");
 		try {
 			br = new BufferedReader(new FileReader(file_name));
-			System.out.println("Nombre fichero: "+file_name);
+			//System.out.println("Nombre fichero: "+file_name);
 			if((line = br.readLine()) != null) {
 				String[] fila = line.split(separador);
-				System.out.println("Tamaño fila: "+fila.length);
+				//System.out.println("Tamaño fila: "+fila.length);
 				for(int j=0; j<n; j++) {
 					ald.add(Double.parseDouble(fila[j]));
 				}
 				// Para hacerlo generico, se incluye este if por si se quiere incluir una instancia ya reconocida con su tipo.
 				// En caso de que no, se quedará como tipo por defecto ""
 				if (fila.length==(n+1)) {
-					System.out.println("Entra");
 					tipo = fila[fila.length-1];
 				}
 			}

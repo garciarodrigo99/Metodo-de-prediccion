@@ -126,6 +126,10 @@ public class Dataset {
 	public Instancia getInstancia(int index) {
 		return Instancia.getInstancia(matriz, index);
 	}
+	
+	public ArrayList<String> getUniqueTypes(){
+		return ((A_categorico)matriz.get(matriz.size()-1)).getNombresUnicos();
+	}
 
 	/**
 	 * Copia cruda de la matriz de atributos teniendo en cuenta los pesos

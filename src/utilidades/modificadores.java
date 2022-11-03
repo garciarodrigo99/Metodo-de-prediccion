@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import clasificacion.ParID;
 import datos.*;
 import datos.atributo.A_categorico;
 import datos.atributo.A_numerico;
@@ -28,14 +29,26 @@ public class modificadores {
 		return multiplyAllMembers(vector,(1.0/multiplicador));
 	}
 	
-	public static ArrayList<Double> lowestValues(ArrayList<Double> vector, int number){
-		ArrayList<Double> lw_val = new ArrayList<Double>();
-		ArrayList<Double> vector_copia = new ArrayList<Double>(copiaCruda(vector));
-		Collections.sort(vector_copia);
-		for(int i=0;i<number;i++) {
-			lw_val.add(vector_copia.get(i));
+//	public static ArrayList<Double> lowestValues(ArrayList<Double> vector, int number){
+//		ArrayList<Double> lw_val = new ArrayList<Double>();
+//		ArrayList<Double> vector_copia = new ArrayList<Double>(copiaCruda(vector));
+//		Collections.sort(vector_copia);
+//		for(int i=0;i<number;i++) {
+//			lw_val.add(vector_copia.get(i));
+//		}
+//		return lw_val;
+//	}
+	
+	public static int maxValueID (ArrayList<ParID> distancias) {
+		int index = 0;
+		double distance = distancias.get(0).getDistancia();
+		for (int i=1; i<distancias.size();i++) {
+			if (distancias.get(i).getDistancia() > distance) {
+				distance = distancias.get(i).getDistancia();
+				index = i;
+			}
 		}
-		return lw_val;
+		return index;
 	}
 	
 	public static <E> ArrayList<E> copiaCruda(ArrayList<E> vector){
